@@ -135,108 +135,104 @@ class _TodayScreenState extends State<TodayScreen> {
                                 final imgUrl = imageUrls[i % imageUrls.length];
                                 return GestureDetector(
                                   onTap: () async {
-                                    await showModalBottomSheet(
+                                    await showDialog(
                                       context: context,
-                                      isScrollControlled: true,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                                      ),
                                       builder: (context) {
-                                        return DraggableScrollableSheet(
-                                          expand: false,
-                                          builder: (context, scrollController) {
-                                            return SingleChildScrollView(
-                                              controller: scrollController,
-                                              child: Padding(
-                                                padding: const EdgeInsets.all(24.0),
-                                                child: Column(
-                                                  mainAxisSize: MainAxisSize.min,
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Center(
-                                                      child: ClipRRect(
-                                                        borderRadius: BorderRadius.circular(16),
-                                                        child: Image.network(imgUrl, width: 120, height: 120, fit: BoxFit.cover),
-                                                      ),
+                                        return Dialog(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(24),
+                                          ),
+                                          child: SingleChildScrollView(
+                                            child: Padding(
+                                              padding: const EdgeInsets.all(24.0),
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  Center(
+                                                    child: ClipRRect(
+                                                      borderRadius: BorderRadius.circular(16),
+                                                      child: Image.network(imgUrl, width: 120, height: 120, fit: BoxFit.cover),
                                                     ),
-                                                    SizedBox(height: 16),
-                                                    Text(task.title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
-                                                    if (task.description != null && task.description!.isNotEmpty)
-                                                      Padding(
-                                                        padding: const EdgeInsets.only(top: 8.0),
-                                                        child: Text(task.description!, style: TextStyle(fontSize: 16)),
-                                                      ),
-                                                    SizedBox(height: 16),
-                                                    Row(
-                                                      children: [
-                                                        Icon(Icons.calendar_today, size: 18, color: Colors.indigo),
-                                                        SizedBox(width: 6),
-                                                        Text('${task.dueDate.year}-${task.dueDate.month.toString().padLeft(2, '0')}-${task.dueDate.day.toString().padLeft(2, '0')}', style: TextStyle(fontSize: 16, color: Colors.indigo)),
-                                                        if (task.reminderTime != null) ...[
-                                                          SizedBox(width: 16),
-                                                          Icon(Icons.access_time, size: 18, color: Colors.yellow[700]),
-                                                          SizedBox(width: 4),
-                                                          Text(task.reminderTime!.format(context), style: TextStyle(fontSize: 16, color: Colors.yellow[700])),
-                                                        ],
+                                                  ),
+                                                  SizedBox(height: 16),
+                                                  Text(task.title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
+                                                  if (task.description != null && task.description!.isNotEmpty)
+                                                    Padding(
+                                                      padding: const EdgeInsets.only(top: 8.0),
+                                                      child: Text(task.description!, style: TextStyle(fontSize: 16)),
+                                                    ),
+                                                  SizedBox(height: 16),
+                                                  Row(
+                                                    children: [
+                                                      Icon(Icons.calendar_today, size: 18, color: Colors.indigo),
+                                                      SizedBox(width: 6),
+                                                      Text('${task.dueDate.year}-${task.dueDate.month.toString().padLeft(2, '0')}-${task.dueDate.day.toString().padLeft(2, '0')}', style: TextStyle(fontSize: 16, color: Colors.indigo)),
+                                                      if (task.reminderTime != null) ...[
+                                                        SizedBox(width: 16),
+                                                        Icon(Icons.access_time, size: 18, color: Colors.yellow[700]),
+                                                        SizedBox(width: 4),
+                                                        Text(task.reminderTime!.format(context), style: TextStyle(fontSize: 16, color: Colors.yellow[700])),
                                                       ],
-                                                    ),
-                                                    SizedBox(height: 16),
-                                                    Row(
-                                                      children: [
-                                                        Icon(Icons.notifications_active, color: task.reminderTime != null ? Colors.yellow[700] : Colors.grey[400]),
-                                                        SizedBox(width: 8),
-                                                        Text(task.reminderTime != null ? 'Reminder set' : 'No reminder', style: TextStyle(fontSize: 16)),
-                                                      ],
-                                                    ),
-                                                    SizedBox(height: 24),
-                                                    Row(
-                                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                      children: [
-                                                        ElevatedButton.icon(
-                                                          style: ElevatedButton.styleFrom(
-                                                            backgroundColor: Colors.indigo,
-                                                            foregroundColor: Colors.white,
-                                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                                          ),
-                                                          icon: Icon(Icons.edit),
-                                                          label: Text('Edit'),
-                                                          onPressed: () async {
-                                                            Navigator.pop(context);
-                                                            await Navigator.push(
-                                                              this.context,
-                                                              MaterialPageRoute(
-                                                                builder: (context) => NewTaskScreen(
-                                                                  onTaskCreated: (editedTask) async {
-                                                                    // Remove old, add new
-                                                                    await TaskStorage.deleteTask(task.id);
-                                                                    await _addTask(editedTask);
-                                                                  },
-                                                                ),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 16),
+                                                  Row(
+                                                    children: [
+                                                      Icon(Icons.notifications_active, color: task.reminderTime != null ? Colors.yellow[700] : Colors.grey[400]),
+                                                      SizedBox(width: 8),
+                                                      Text(task.reminderTime != null ? 'Reminder set' : 'No reminder', style: TextStyle(fontSize: 16)),
+                                                    ],
+                                                  ),
+                                                  SizedBox(height: 24),
+                                                  Row(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                    children: [
+                                                      ElevatedButton.icon(
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: Colors.indigo,
+                                                          foregroundColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                                        ),
+                                                        icon: Icon(Icons.edit),
+                                                        label: Text('Edit'),
+                                                        onPressed: () async {
+                                                          Navigator.pop(context);
+                                                          await Navigator.push(
+                                                            this.context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) => NewTaskScreen(
+                                                                onTaskCreated: (editedTask) async {
+                                                                  // Remove old, add new
+                                                                  await TaskStorage.deleteTask(task.id);
+                                                                  await _addTask(editedTask);
+                                                                },
+                                                                existingTask: task,
                                                               ),
-                                                            );
-                                                          },
+                                                            ),
+                                                          );
+                                                        },
+                                                      ),
+                                                      ElevatedButton.icon(
+                                                        style: ElevatedButton.styleFrom(
+                                                          backgroundColor: Colors.red[700],
+                                                          foregroundColor: Colors.white,
+                                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                                         ),
-                                                        ElevatedButton.icon(
-                                                          style: ElevatedButton.styleFrom(
-                                                            backgroundColor: Colors.red[700],
-                                                            foregroundColor: Colors.white,
-                                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                                                          ),
-                                                          icon: Icon(Icons.delete),
-                                                          label: Text('Delete'),
-                                                          onPressed: () async {
-                                                            await TaskStorage.deleteTask(task.id);
-                                                            Navigator.pop(context);
-                                                            await _loadTasks();
-                                                          },
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
+                                                        icon: Icon(Icons.delete),
+                                                        label: Text('Delete'),
+                                                        onPressed: () async {
+                                                          await TaskStorage.deleteTask(task.id);
+                                                          Navigator.pop(context);
+                                                          await _loadTasks();
+                                                        },
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
                                               ),
-                                            );
-                                          },
+                                            ),
+                                          ),
                                         );
                                       },
                                     );
