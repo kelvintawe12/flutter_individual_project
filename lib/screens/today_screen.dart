@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/task.dart';
 import '../storage/task_storage.dart';
 import 'new_task_screen.dart';
+import 'package:lottie/lottie.dart';
 
 class TodayScreen extends StatefulWidget {
   @override
@@ -96,17 +97,118 @@ class _TodayScreenState extends State<TodayScreen> {
                   child: _loading
                       ? Center(child: CircularProgressIndicator())
                       : _tasks.isEmpty
-                          ? Center(child: Text('No tasks for today'))
-                          : ListView(
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 180,
+                                    height: 180,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(bottom: 16.0),
+                                      child:  
+                                        // Lottie animation for empty state
+                                        // Download a Lottie JSON from lottiefiles.com or use a network asset
+                                        // Example: https://assets10.lottiefiles.com/packages/lf20_jzv1zqxr.json
+                                        // You can replace the URL with any Lottie animation you like
+                                        // Requires lottie package
+                                        Lottie.network('https://assets10.lottiefiles.com/packages/lf20_jzv1zqxr.json'),
+                                    ),
+                                  ),
+                                  Text('No tasks for today', style: TextStyle(fontSize: 18, color: Colors.grey[700])),
+                                ],
+                              ),
+                            )
+                          : ListView.separated(
                               padding: EdgeInsets.all(16),
-                              children: [
-                                Text('Remind 4sasks', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                                SizedBox(height: 8),
-                                ..._tasks.map((task) => ListTile(
-                                      title: Text(task.title),
-                                      subtitle: task.description != null ? Text(task.description!) : null,
-                                    )),
-                              ],
+                              itemCount: _tasks.length,
+                              separatorBuilder: (context, i) => SizedBox(height: 16),
+                              itemBuilder: (context, i) {
+                                final task = _tasks[i];
+                                final imageUrls = [
+                                  'https://images.pexels.com/photos/4145196/pexels-photo-4145196.jpeg',
+                                  'https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg',
+                                  'https://images.pexels.com/photos/4145191/pexels-photo-4145191.jpeg',
+                                  'https://images.pexels.com/photos/4145193/pexels-photo-4145193.jpeg',
+                                  'https://images.pexels.com/photos/4145194/pexels-photo-4145194.jpeg',
+                                ];
+                                final imgUrl = imageUrls[i % imageUrls.length];
+                                return Card(
+                                  elevation: 4,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.only(
+                                            topLeft: Radius.circular(16),
+                                            bottomLeft: Radius.circular(16)),
+                                        child: Image.network(
+                                          imgUrl,
+                                          width: 80,
+                                          height: 80,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(12.0),
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: Text(
+                                                      task.title,
+                                                      style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 18,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  if (task.reminderTime != null)
+                                                    Icon(Icons.notifications_active, color: Colors.yellow[700], size: 22),
+                                                ],
+                                              ),
+                                              if (task.description != null && task.description!.isNotEmpty)
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 4.0),
+                                                  child: Text(
+                                                    task.description!,
+                                                    style: TextStyle(color: Colors.grey[700]),
+                                                  ),
+                                                ),
+                                              SizedBox(height: 8),
+                                              Row(
+                                                children: [
+                                                  Icon(Icons.calendar_today, size: 16, color: Colors.indigo),
+                                                  SizedBox(width: 4),
+                                                  Text(
+                                                    '${task.dueDate.year}-${task.dueDate.month.toString().padLeft(2, '0')}-${task.dueDate.day.toString().padLeft(2, '0')}',
+                                                    style: TextStyle(fontSize: 14, color: Colors.indigo),
+                                                  ),
+                                                  if (task.reminderTime != null) ...[
+                                                    SizedBox(width: 12),
+                                                    Icon(Icons.access_time, size: 16, color: Colors.yellow[700]),
+                                                    SizedBox(width: 2),
+                                                    Text(
+                                                      task.reminderTime!.format(context),
+                                                      style: TextStyle(fontSize: 14, color: Colors.yellow[700]),
+                                                    ),
+                                                  ],
+                                                ],
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
                             ),
                 ),
               ),

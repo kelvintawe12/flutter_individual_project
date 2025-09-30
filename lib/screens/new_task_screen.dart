@@ -22,6 +22,10 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     return Scaffold(
       backgroundColor: Color(0xFF0A183D),
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: Text('New Task'),
         backgroundColor: Color(0xFF0A183D),
       ),

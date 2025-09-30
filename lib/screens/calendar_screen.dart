@@ -97,23 +97,27 @@ class _CalendarScreenState extends State<CalendarScreen> {
                       ),
                     ),
                     SizedBox(height: 16),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        padding: EdgeInsets.all(16),
+                        child: _selectedTasks.isEmpty
+                            ? Center(child: Text('No tasks for this day'))
+                            : ListView.separated(
+                                itemCount: _selectedTasks.length,
+                                separatorBuilder: (context, i) => SizedBox(height: 8),
+                                itemBuilder: (context, i) {
+                                  final task = _selectedTasks[i];
+                                  return ListTile(
+                                    title: Text(task.title),
+                                    subtitle: task.description != null ? Text(task.description!) : null,
+                                  );
+                                },
+                              ),
                       ),
-                      padding: EdgeInsets.all(16),
-                      child: _selectedTasks.isEmpty
-                          ? Text('No tasks for this day')
-                          : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: _selectedTasks
-                                  .map((task) => ListTile(
-                                        title: Text(task.title),
-                                        subtitle: task.description != null ? Text(task.description!) : null,
-                                      ))
-                                  .toList(),
-                            ),
                     ),
                   ],
                 ),
