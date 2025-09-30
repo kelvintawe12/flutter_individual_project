@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'profile_settings_page.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -97,6 +98,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onTap: () {},
                     ),
                     Divider(height: 0, thickness: 1, indent: 20, endIndent: 20),
+                    ListTile(
+                      leading: Icon(Icons.person),
+                      title: Text('Edit Profile'),
+                      trailing: Icon(Icons.arrow_forward_ios, size: 16),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/profile');
+                      },
+                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
                       child: Row(

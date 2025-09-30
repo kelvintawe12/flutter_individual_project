@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/task.dart';
 import '../storage/task_storage.dart';
 import 'new_task_screen.dart';
+import '../widgets/user_profile_avatar.dart';
 import 'package:lottie/lottie.dart';
 
 class TodayScreen extends StatefulWidget {
@@ -82,6 +83,16 @@ class _TodayScreenState extends State<TodayScreen> {
         appBar: AppBar(
           title: Text('Today'),
           elevation: 0,
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 12.0),
+              child: UserProfileAvatar(
+                onTap: () {
+                  Navigator.pushNamed(context, '/profile');
+                },
+              ),
+            ),
+          ],
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'screens/today_screen.dart';
 import 'screens/calendar_screen.dart';
 import 'screens/settings_screen.dart';
+import 'screens/profile_settings_page.dart';
+import 'entry_point.dart';
 
 void main() {
   runApp(StudyPlannerApp());
@@ -25,7 +27,15 @@ class StudyPlannerApp extends StatelessWidget {
           unselectedItemColor: Colors.white,
         ),
       ),
-      home: MainNavigation(),
+      initialRoute: '/', // EntryPoint
+      routes: {
+        '/': (context) => EntryPoint(),
+        '/main': (context) => MainNavigation(),
+        '/today': (context) => TodayScreen(),
+        '/calendar': (context) => CalendarScreen(),
+        '/settings': (context) => SettingsScreen(),
+        '/profile': (context) => ProfileSettingsPage(),
+      },
       debugShowCheckedModeBanner: false,
     );
   }
