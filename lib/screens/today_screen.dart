@@ -4,71 +4,106 @@ import '../storage/task_storage.dart';
 import 'new_task_screen.dart';
 import '../widgets/user_profile_avatar.dart';
 import 'package:lottie/lottie.dart';
+import 'dart:async';
 
 class TodayScreen extends StatefulWidget {
   @override
   State<TodayScreen> createState() => _TodayScreenState();
 }
 
+
 class _TodayScreenState extends State<TodayScreen> {
   List<Task> _tasks = [];
   bool _loading = true;
-
-  bool _reminderShown = false;
+  List<Timer>? _reminderTimers = [];
 
   @override
   void initState() {
     super.initState();
     _loadTasks();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _checkReminders());
+  }
+
+  @override
+  void dispose() {
+    if (_reminderTimers != null) {
+      for (final timer in _reminderTimers!) {
+        timer.cancel();
+      }
+    }
+    super.dispose();
   }
 
   Future<void> _loadTasks() async {
+    // Cancel any previous timers
+    if (_reminderTimers != null) {
+      for (final timer in _reminderTimers!) {
+        timer.cancel();
+      }
+      _reminderTimers!.clear();
+    }
+
     final allTasks = await TaskStorage.loadTasks();
     final today = DateTime.now();
+    final todayTasks = allTasks.where((task) =>
+      task.dueDate.year == today.year &&
+      task.dueDate.month == today.month &&
+      task.dueDate.day == today.day
+    ).toList();
     setState(() {
-      _tasks = allTasks.where((task) =>
-        task.dueDate.year == today.year &&
-        task.dueDate.month == today.month &&
-        task.dueDate.day == today.day
-      ).toList();
+      _tasks = todayTasks;
       _loading = false;
     });
-    _checkReminders();
-  }
-  void _checkReminders() {
-    if (_reminderShown) return;
+
+    // Schedule timers for reminders
     final now = DateTime.now();
-    final soonTasks = _tasks.where((task) {
-      if (task.reminderTime == null) return false;
-      final reminderDateTime = DateTime(
-        now.year, now.month, now.day, task.reminderTime!.hour, task.reminderTime!.minute);
-      return reminderDateTime.isAfter(now) &&
-        reminderDateTime.difference(now).inMinutes <= 60;
-    }).toList();
-    if (soonTasks.isNotEmpty) {
-      _reminderShown = true;
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Upcoming Reminders'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: soonTasks.map((task) => ListTile(
-              title: Text(task.title),
-              subtitle: task.description != null ? Text(task.description!) : null,
-            )).toList(),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
+    for (final task in todayTasks) {
+      if (task.reminderTime != null) {
+        final reminderDateTime = DateTime(
+          now.year, now.month, now.day, task.reminderTime!.hour, task.reminderTime!.minute);
+        final diff = reminderDateTime.difference(now);
+        if (diff.inMilliseconds > 0) {
+          _reminderTimers?.add(Timer(diff, () {
+            if (mounted) {
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => AlertDialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                  title: Row(
+                    children: [
+                      Lottie.asset('assets/success.json', width: 48, height: 48, repeat: false),
+                      SizedBox(width: 12),
+                      Text('Reminder!', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text('It\'s time for:'),
+                      SizedBox(height: 12),
+                      Text(task.title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+                      if (task.description != null && task.description!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(task.description!),
+                        ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text('Close', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+              );
+            }
+          }));
+        }
+      }
     }
   }
+
 
   Future<void> _addTask(Task task) async {
     await TaskStorage.addTask(task);
@@ -123,7 +158,7 @@ class _TodayScreenState extends State<TodayScreen> {
                                         // Example: https://assets10.lottiefiles.com/packages/lf20_jzv1zqxr.json
                                         // You can replace the URL with any Lottie animation you like
                                         // Requires lottie package
-                                        Lottie.network('https://assets10.lottiefiles.com/packages/lf20_jzv1zqxr.json'),
+                                        Lottie.asset('assets/success.json'),
                                     ),
                                   ),
                                   Text('No tasks for today', style: TextStyle(fontSize: 18, color: Colors.grey[700])),
