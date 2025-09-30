@@ -27,10 +27,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final tasks = prefs.getStringList('tasks');
       int bytes = 0;
       int count = 0;
-      if (tasks != null) {
+      if (tasks != null) { 
         count = tasks.length;
         for (final t in tasks) {
-          if (t != null) bytes += t.length;
+          bytes += t.length; 
         }
       }
       setState(() {
